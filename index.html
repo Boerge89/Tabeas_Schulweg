@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktives Lernportal: Mathematische Probleme systematisch lösen</title>
+    <style>
+        :root {
+            --primary-color: #1f4e79;
+            --secondary-color: #2f5597;
+            --accent-color: #d9e1f2;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --input-bg: #fff2cc;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .problem-box {
+            background-color: var(--accent-color);
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .problem-box h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .step-card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e1e8ed;
+        }
+
+        .step-card h2 {
+            color: var(--primary-color);
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .instruction {
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, .table-input, .select-cloze {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            font-weight: bold;
+            text-align: center;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .select-cloze {
+            background-color: #e2efda;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: inline-block;
+            margin: 0 5px;
+            width: auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #d9d9d9;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        .feedback-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-waiting { background-color: #e0e0e0; color: #555; }
+        .status-correct { background-color: #d4edda; color: #155724; }
+        .status-wrong { background-color: #f8d7da; color: #721c24; }
+
+        .equation-cloze-container {
+            background-color: #f8f9fa;
+            border: 1px dashed var(--primary-color);
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-radius: 6px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .radio-group {
+            margin: 15px 0;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .final-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .final-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .math-variable {
+            font-style: italic;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Systematisches Lösen mathematischer Probleme</h1>
+        <p>Interaktive Erarbeitung am Beispiel: Tabeas Schulweg</p>
+    </header>
+
+    <div class="problem-box">
+        <h3>Die Problemstellung:</h3>
+        <p>Tabea geht um 7 Uhr zu Fuß zur 1,4 km entfernten Schule. Neun Minuten später fährt ihr Vater mit dem Fahrrad hinterher. Tabea geht durchschnittlich 100 Meter pro Minute (6 km/h) und ihr Vater fährt durchschnittlich 250 Meter pro Minute (15 km/h). Schafft der Vater es, Tabea noch vor der Schule einzuholen?</p>
+    </div>
+
+    <!-- SCHRITT 1 -->
+    <div class="step-card" id="step1">
+        <h2>Schritt 1: Verstehen der Aufgabe <span id="badge-s1" class="feedback-badge status-waiting">In Bearbeitung</span></h2>
+        <p class="instruction">Trage die gegebenen Kernwerte aus dem Text ein, um die Grundlagen zu fixieren.</p>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>v (Tabea) in m/min:</label>
+                <input type="number" id="v_tabea" placeholder="z.B. 100" oninput="checkStep1()">
+            </div>
+            <div class="input-group">
+                <label>v (Vater) in m/min:</label>
+                <input type="number" id="v_vater" placeholder="z.B. 250" oninput="checkStep1()">
+            </div>
+            <div class="input-group">
+                <label>Vorsprung Tabea (min):</label>
+                <input type="number" id="vorsprung" placeholder="z.B. 9" oninput="checkStep1()">
+            </div>
+            <div class="input-group">
+                <label>Schulweg gesamt (Meter):</label>
+                <input type="number" id="schulweg" placeholder="z.B. 1400" oninput="checkStep1()">
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHRITT 2 -->
+    <div class="step-card" id="step2">
+        <h2>Schritt 2: Zerlegen in Teilprobleme (Terme & Tabelle) <span id="badge-s2" class="feedback-badge status-waiting">In Bearbeitung</span></h2>
+        <p class="instruction">Ergänze die Tabelle für den zurückgelegten Weg (in Metern) in Abhängigkeit von der Fahrzeit des Vaters (<span class="math-variable">t</span>).</p>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Zeitpunkt</th>
+                        <th>Weg von Tabea (Meter)</th>
+                        <th>Weg vom Vater (Meter)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Start des Vaters (<span class="math-variable">t</span> = 0)</strong></td>
+                        <td><input type="number" id="t0_t" class="table-input" oninput="checkStep2()"></td>
+                        <td><input type="number" id="t0_v" class="table-input" oninput="checkStep2()"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>1 min nach Start (<span class="math-variable">t</span> = 1)</strong></td>
+                        <td><input type="number" id="t1_t" class="table-input" oninput="checkStep2()"></td>
+                        <td><input type="number" id="t1_v" class="table-input" oninput="checkStep2()"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2 min nach Start (<span class="math-variable">t</span> = 2)</strong></td>
+                        <td><input type="number" id="t2_t" class="table-input" oninput="checkStep2()"></td>
+                        <td><input type="number" id="t2_v" class="table-input" oninput="checkStep2()"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Allgemeiner Term (<span class="math-variable">t</span> Min.)</strong></td>
+                        <td style="background-color: var(--accent-color); font-weight: bold;">900 + 100 &middot; <span class="math-variable">t</span></td>
+                        <td style="background-color: var(--accent-color); font-weight: bold;">250 &middot; <span class="math-variable">t</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SCHRITT 3 -->
+    <div class="step-card" id="step3">
+        <h2>Schritt 3: Rechenweg durchführen (Gleichung aufstellen & lösen) <span id="badge-s3" class="feedback-badge status-waiting">In Bearbeitung</span></h2>
+        <p class="instruction">Am Treffpunkt haben beide dieselbe Strecke zurückgelegt. Bringe die Terme mithilfe der Dropdown-Menüs in die richtige Gleichungsform:</p>
+        
+        <div class="equation-cloze-container">
+            <select id="cloze_left" class="select-cloze" onchange="checkStep3()">
+                <option value="">--Wähle Term--</option>
+                <option value="100_t">100 &middot; t</option>
+                <option value="250_t">250 &middot; t</option>
+                <option value="900">900</option>
+            </select>
+            <span>=</span>
+            <select id="cloze_right1" class="select-cloze" onchange="checkStep3()">
+                <option value="">--Wähle Term--</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="900">900</option>
+            </select>
+            <span>+</span>
+            <select id="cloze_right2" class="select-cloze" onchange="checkStep3()">
+                <option value="">--Wähle Term--</option>
+                <option value="100_t">100 &middot; t</option>
+                <option value="250_t">250 &middot; t</option>
+                <option value="900_t">900 &middot; t</option>
+            </select>
+        </div>
+
+        <div id="solve-container" style="display: none; max-width: 300px; margin: 20px auto 0 auto;" class="input-group">
+            <label style="text-align: center; font-weight: bold;">Super! Löse nun nach <span class="math-variable">t</span> auf (in Minuten):</label>
+            <input type="number" id="sol_t" placeholder="t eingeben" oninput="checkStep3()">
+        </div>
+    </div>
+
+    <!-- SCHRITT 4 -->
+    <div class="step-card" id="step4">
+        <h2>Schritt 4: Rückschau und Antwort <span id="badge-s4" class="feedback-badge status-waiting">In Bearbeitung</span></h2>
+        <p class="instruction">Überprüfe das Ergebnis im Kontext der Realität.</p>
+        
+        <div class="input-group" style="max-width: 400px; margin-bottom: 15px;">
+            <label>Berechne die Strecke bis zum Treffpunkt (Meter):</label>
+            <input type="number" id="treff_meter" placeholder="Strecke berechnen" oninput="checkStep4()">
+        </div>
+
+        <p class="instruction" style="font-weight: bold; margin-top: 15px; color: var(--text-color);">Schafft der Vater es, Tabea vor der Schule einzuholen?</p>
+        <div class="radio-group">
+            <input type="radio" id="ans_ja" name="antwort" value="ja" onclick="checkStep4()">
+            <label for="ans_ja">Ja, er holt sie ein.</label>
+            <input type="radio" id="ans_nein" name="antwort" value="nein" onclick="checkStep4()">
+            <label for="ans_nein">Nein, die Schule ist vorher erreicht.</label>
+        </div>
+
+        <div id="final-banner" class="final-result final-success">
+            <strong>Ausgezeichnet!</strong> Der Vater benötigt theoretisch 6 Minuten, was einer Strecke von 1500 Metern entspricht. Da die Schule jedoch nur 1400 Meter entfernt ist, kommt Tabea sicher an, bevor ihr Vater sie einholen kann.
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateBadge(id, status, text) {
+        const badge = document.getElementById(id);
+        badge.className = 'feedback-badge ' + status;
+        badge.innerText = text;
+    }
+
+    function checkStep1() {
+        const vt = document.getElementById('v_tabea').value;
+        const vv = document.getElementById('v_vater').value;
+        const vor = document.getElementById('vorsprung').value;
+        const sw = document.getElementById('schulweg').value;
+
+        if(vt == 100 && vv == 250 && vor == 9 && sw == 1400) {
+            updateBadge('badge-s1', 'status-correct', '✔ Richtig');
+            return true;
+        } else if(vt && vv && vor && sw) {
+            updateBadge('badge-s1', 'status-wrong', '✖ Prüfen');
+        } else {
+            updateBadge('badge-s1', 'status-waiting', 'In Bearbeitung');
+        }
+        return false;
+    }
+
+    function checkStep2() {
+        const t0t = document.getElementById('t0_t').value;
+        const t0v = document.getElementById('t0_v').value;
+        const t1t = document.getElementById('t1_t').value;
+        const t1v = document.getElementById('t1_v').value;
+        const t2t = document.getElementById('t2_t').value;
+        const t2v = document.getElementById('t2_v').value;
+
+        if(t0t == 900 && t0v == 0 && t1t == 1000 && t1v == 250 && t2t == 1100 && t2v == 500) {
+            updateBadge('badge-s2', 'status-correct', '✔ Richtig');
+            return true;
+        } else if(t0t && t0v && t1t && t1v && t2t && t2v) {
+            updateBadge('badge-s2', 'status-wrong', '✖ Prüfen');
+        } else {
+            updateBadge('badge-s2', 'status-waiting', 'In Bearbeitung');
+        }
+        return false;
+    }
+
+    function checkStep3() {
+        const cLeft = document.getElementById('cloze_left').value;
+        const cRight1 = document.getElementById('cloze_right1').value;
+        const cRight2 = document.getElementById('cloze_right2').value;
+        const solT = document.getElementById('sol_t').value;
+        
+        const eqCorrect = (cLeft === "250_t" && cRight1 === "900" && cRight2 === "100_t");
+        
+        if (eqCorrect) {
+            document.getElementById('solve-container').style.display = 'block';
+            if(solT == 6) {
+                updateBadge('badge-s3', 'status-correct', '✔ Gleichung & Lösung korrekt (t = 6)');
+                return true;
+            } else if(solT) {
+                updateBadge('badge-s3', 'status-wrong', '✖ Gleichung stimmt, Lösung prüfen');
+            } else {
+                updateBadge('badge-s3', 'status-waiting', 'Gleichung steht, löse nach t auf...');
+            }
+        } else {
+            document.getElementById('solve-container').style.display = 'none';
+            if(cLeft && cRight1 && cRight2) {
+                updateBadge('badge-s3', 'status-wrong', '✖ Gleichung unvollständig/falsch');
+            } else {
+                updateBadge('badge-s3', 'status-waiting', 'In Bearbeitung');
+            }
+        }
+        return false;
+    }
+
+    function checkStep4() {
+        const meter = document.getElementById('treff_meter').value;
+        const rNein = document.getElementById('ans_nein').checked;
+        const rJa = document.getElementById('ans_ja').checked;
+
+        let meterCorrect = (meter == 1500);
+
+        if(meterCorrect && rNein) {
+            updateBadge('badge-s4', 'status-correct', '✔ Gelöst!');
+            document.getElementById('final-banner').style.display = 'block';
+        } else {
+            document.getElementById('final-banner').style.display = 'none';
+            if(meter || rJa || rNein) {
+                updateBadge('badge-s4', 'status-wrong', '✖ Überprüfen');
+            } else {
+                updateBadge('badge-s4', 'status-waiting', 'In Bearbeitung');
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
